@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>پرسشنامه شهر ۱۵ دقیقه‌ای</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<style>
+.map{height:280px;border-radius:12px;margin-top:10px;z-index:0;border:1px solid var(--bd)}
+.leaflet-container{font-family:inherit}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f4f6f5;--card:#fff;--tx:#1b2a27;--mut:#6a7a76;--ac:#0f766e;--acl:#d9f1ee;--bd:#dbe3e1}
+:root:not([data-theme="light"]){}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101716;--card:#182321;--tx:#e8f0ee;--mut:#9bb0ab;--ac:#2dd4bf;--acl:#16413c;--bd:#2a3b38}}
+:root[data-theme="dark"]{--bg:#101716;--card:#182321;--tx:#e8f0ee;--mut:#9bb0ab;--ac:#2dd4bf;--acl:#16413c;--bd:#2a3b38}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:Vazirmatn,Tahoma,sans-serif;line-height:1.8}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--card);border-bottom:1px solid var(--bd);padding:8px 16px}
+.bar div{height:6px;border-radius:3px;background:var(--bd);overflow:hidden;max-width:720px;margin:auto}
+.bar i{display:block;height:100%;width:0;background:var(--ac);transition:width .3s}
+.bar small{display:block;max-width:720px;margin:2px auto 0;color:var(--mut);font-size:12px}
+main{max-width:720px;margin:auto;padding:16px 12px 60px}
+header h1{font-size:22px;margin:12px 0 4px}header p{color:var(--mut);margin:0 0 16px;font-size:14px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px;margin-bottom:14px;scroll-margin-top:70px;transition:border-color .2s}
+.q.done{border-color:var(--ac)}
+.card h2{font-size:16px;margin:0 0 4px}.card h2 b{color:var(--ac);margin-left:6px}
+.hint{color:var(--mut);font-size:13px;margin:0 0 10px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.chip{font:inherit;font-size:14px;padding:8px 14px;border-radius:999px;border:1px solid var(--bd);background:var(--card);color:var(--tx);cursor:pointer;min-height:40px}
+.chip.on{background:var(--ac);border-color:var(--ac);color:#fff}
+:root[data-theme="dark"] .chip.on{color:#06201c}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .chip.on{color:#06201c}}
+input[type=text],input[type=number],textarea{font:inherit;width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--bd);background:var(--bg);color:var(--tx)}
+textarea{min-height:90px;resize:vertical}
+.btn{font:inherit;padding:10px 18px;border-radius:10px;border:0;background:var(--ac);color:#fff;cursor:pointer;margin-top:12px}
+:root[data-theme="dark"] .btn{color:#06201c}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn{color:#06201c}}
+.btn.ghost{background:var(--acl);color:var(--ac)}
+.step{display:flex;align-items:center;gap:10px}.step button{width:44px;height:44px;font-size:22px;border-radius:50%;border:1px solid var(--bd);background:var(--card);color:var(--tx);cursor:pointer}
+.step input{width:90px;text-align:center;font-size:18px}
+.loc{display:grid;gap:8px;margin-top:10px}.loc label{font-size:14px;font-weight:600}
+.row.q{padding:12px 14px}.row p{margin:0 0 8px;font-size:15px}
+.scale{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.scale button{font:inherit;padding:10px 0;border-radius:10px;border:1px solid var(--bd);background:var(--card);color:var(--tx);cursor:pointer}
+.scale button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.ends{display:flex;justify-content:space-between;font-size:11px;color:var(--mut);margin-top:3px}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+.seg button{font:inherit;font-size:13px;padding:10px 4px;border-radius:10px;border:1px solid var(--bd);background:var(--card);color:var(--tx);cursor:pointer}
+.seg button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.det{margin-top:12px;border-top:1px dashed var(--bd);padding-top:8px}
+.det h4{margin:12px 0 0;font-size:14px;color:var(--ac)}
+.rate{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:6px;background:var(--bg);border-radius:10px;padding:6px 10px;font-size:13px}
+.rate .scale{width:170px;gap:3px}.rate .scale button{padding:4px 0;font-size:13px}
+.sec{font-size:15px;font-weight:700;margin:22px 4px 8px;color:var(--ac)}
+.ok{text-align:center;padding:28px 16px}
+</style>
+</head>
+<body>
+<div class="bar"><div><i id="pb"></i></div><small id="pt"></small></div>
+<main>
+<header><h1>پرسشنامه شهر ۱۵ دقیقه‌ای</h1><p>پاسخ شما به برنامه‌ریزی بهتر خدمات محله کمک می‌کند. با انتخاب هر گزینه، صفحه خودکار به سؤال بعد می‌رود.</p></header>
+<div id="app"></div>
+</main>
+<script>
+const FA=n=>String(n).replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d]);
+const A={};const app=document.getElementById('app');
+function el(t,c,x){const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+function chips(opts,multi,cb){const w=el('div','chips');const val=[];
+ opts.forEach(o=>{const b=el('button','chip',o);b.type='button';b.onclick=()=>{
+  if(multi){b.classList.toggle('on');const i=val.indexOf(o);i<0?val.push(o):val.splice(i,1)}
+  else{w.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));b.classList.add('on');val[0]=o}
+  cb&&cb(val.slice(),o)};w.appendChild(b)});return w}
+function next(from){const qs=[...document.querySelectorAll('.q')].filter(q=>q.offsetParent!==null);
+ const t=qs[qs.indexOf(from)+1]||document.getElementById('sub');if(t)setTimeout(()=>t.scrollIntoView({behavior:'smooth',block:'start'}),250)}
+function done(q){q.classList.add('done');prog()}
+function prog(){const all=document.querySelectorAll('.q:not(.opt)');const d=document.querySelectorAll('.q.done:not(.opt)');
+ document.getElementById('pb').style.width=(all.length?d.length/all.length*100:0)+'%';
+ document.getElementById('pt').textContent=FA(d.length)+' از '+FA(all.length)+' پاسخ داده شد'}
+const DEF=[35.6892,51.3890];
+const icon=e=>L.divIcon({html:'<div style="font-size:28px;line-height:28px">'+e+'</div>',className:'',iconSize:[28,28],iconAnchor:[14,26]});
+function mkMap(host,onClick,center){
+ const fb=()=>el('p','hint','نقشه در این محیط بارگذاری نشد؛ لطفاً نام محل را بنویسید.');
+ if(!window.L){host.appendChild(fb());return null}
+ const d=el('div','map');host.appendChild(d);
+ const m=L.map(d).setView(center||DEF,13);let bad=0;
+ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(m).on('tileerror',()=>{if(++bad===4)d.replaceWith(fb())});
+ m.on('click',e=>onClick(e.latlng));return m}
+function placePicker(S,det){
+ const w=el('div');const b=el('button','btn ghost','🗺️ انتخاب محل این خدمت روی نقشه');b.type='button';b.style.marginTop='6px';
+ const st=el('span','hint');const host=el('div');let m,mk;
+ const save=p=>S.place={lat:+p.lat.toFixed(5),lng:+p.lng.toFixed(5)};
+ b.onclick=()=>{b.hidden=true;const h=A.loc.home;
+  m=mkMap(host,ll=>{save(ll);st.textContent=' ✓ ثبت شد (پین قابل جابه‌جایی است)';
+   if(mk)mk.setLatLng(ll);else{mk=L.marker(ll,{icon:icon('📍'),draggable:true}).addTo(m);mk.on('dragend',e=>save(e.target.getLatLng()))}},h&&h.lat?[h.lat,h.lng]:null);
+  if(m){if(h&&h.lat)L.marker([h.lat,h.lng],{icon:icon('🏠'),interactive:false}).addTo(m);setTimeout(()=>m.invalidateSize(),60);st.textContent=' روی نقشه لمس کنید تا پین قرار بگیرد'}};
+ w.append(b,st,host);det.appendChild(w)}
+let N=0;
+function Q(title,hint,cls){const c=el('section','card q'+(cls?' '+cls:''));const h=el('h2');const b=el('b',null,FA(++N)+'.');h.append(b,title);c.appendChild(h);if(hint)c.appendChild(el('p','hint',hint));app.appendChild(c);return c}
+function single(key,title,opts,hint){const q=Q(title,hint);q.appendChild(chips(opts,false,v=>{A[key]=v[0];done(q);next(q)}));return q}
+function multi(key,title,opts,hint){const q=Q(title,hint||'می‌توانید چند گزینه انتخاب کنید');
+ q.appendChild(chips(opts,true,v=>{A[key]=v;v.length?q.classList.add('done'):q.classList.remove('done');prog()}));
+ const b=el('button','btn','ادامه ←');b.type='button';b.onclick=()=>{if(A[key]&&A[key].length)done(q);next(q)};q.appendChild(b)}
+
+single('gender','جنسیت',['زن','مرد','ترجیح می‌دهم پاسخ ندهم']);
+(()=>{const q=Q('سال تولد','سال شمسی، مثلاً ۱۳۷۰');const i=el('input');i.type='number';i.inputMode='numeric';i.placeholder='۱۳۷۰';i.style.maxWidth='160px';
+ let t;i.oninput=()=>{clearTimeout(t);const v=+i.value;if(v>=1300&&v<=1420){A.birth=v;done(q);t=setTimeout(()=>next(q),700)}else q.classList.remove('done')};q.appendChild(i)})();
+single('marital','وضعیت تأهل',['مجرد','متأهل','سایر']);
+single('edu','تحصیلات',['بی‌سواد','ابتدایی/راهنمایی','دیپلم','کاردانی','کارشناسی','کارشناسی ارشد','دکتری','حوزوی']);
+multi('job','فعالیت',['شاغل','دانشجو','دانش‌آموز','خانه‌دار','بازنشسته','بیکار','سایر']);
+multi('vehicle','وسیله نقلیه شخصی',['خودرو شخصی','خودرو خانواده','دوچرخه','موتورسیکلت','اسکوتر و …','ندارم']);
+
+(()=>{const q=Q('محل سکونت و محل فعالیت','ابتدا «سکونت» یا «فعالیت» را انتخاب و سپس روی نقشه لمس کنید تا پین قرار بگیرد. پین را می‌توانید جابه‌جا کنید.');
+ A.loc={home:{},work:{}};let mode='home';const mk={},em={home:'🏠',work:'🏢'};let m=null;
+ const seg=el('div','seg');seg.style.gridTemplateColumns='1fr 1fr';const bt={};
+ const setMode=k=>{mode=k;Object.keys(bt).forEach(x=>bt[x].classList.toggle('on',x===k))};
+ [['home','🏠 محل سکونت'],['work','🏢 محل فعالیت']].forEach(([k,l])=>{const b=el('button',k==='home'?'on':null,l);b.type='button';b.onclick=()=>setMode(k);bt[k]=b;seg.appendChild(b)});
+ const st=el('p','hint');st.style.margin='8px 0 0';const host=el('div');
+ const chk=()=>{(A.loc.home.lat||A.loc.home.text)?q.classList.add('done'):q.classList.remove('done');prog()};
+ function put(k,ll){A.loc[k].lat=+ll.lat.toFixed(5);A.loc[k].lng=+ll.lng.toFixed(5);
+  if(m){if(mk[k])mk[k].setLatLng(ll);else{mk[k]=L.marker(ll,{icon:icon(em[k]),draggable:true}).addTo(m);mk[k].on('dragend',e=>put(k,e.target.getLatLng()))}}
+  st.textContent='✓ '+(k==='home'?'محل سکونت':'محل فعالیت')+' ثبت شد';
+  if(k==='home'&&!A.loc.work.lat){setMode('work');st.textContent+=' — حالا محل فعالیت را مشخص کنید (یا ادامه دهید)'}chk()}
+ m=mkMap(host,ll=>put(mode,ll));
+ const gb=el('button','btn ghost','📍 استفاده از موقعیت فعلی من');gb.type='button';gb.style.marginTop='8px';
+ gb.onclick=()=>{st.textContent='در حال دریافت موقعیت…';try{navigator.geolocation.getCurrentPosition(p=>{const ll={lat:p.coords.latitude,lng:p.coords.longitude};put(mode,ll);if(m)m.setView([ll.lat,ll.lng],15)},()=>st.textContent='دسترسی به موقعیت ممکن نشد؛ روی نقشه لمس کنید.',{timeout:8000})}catch(e){st.textContent='دسترسی به موقعیت ممکن نشد.'}};
+ const g=el('div','loc');
+ [['home','نام محله/خیابان سکونت (اختیاری)'],['work','نام محله/خیابان محل فعالیت (اختیاری)']].forEach(([k,l])=>{const lb=el('label',null,l);const i=el('input');i.type='text';i.oninput=()=>{A.loc[k].text=i.value;chk()};g.append(lb,i)});
+ const nb=el('button','btn','ادامه ←');nb.type='button';nb.onclick=()=>next(q);
+ q.append(seg,host,st,gb,g,nb)})();
+
+(()=>{const q=Q('مدت زمان سکونت در این محله','به سال');A.years=0;const s=el('div','step');
+ const m=el('button',null,'−'),p=el('button',null,'+'),i=el('input');i.type='number';i.min=0;i.value=0;i.inputMode='numeric';m.type=p.type='button';
+ const set=v=>{v=Math.max(0,Math.min(99,+v||0));i.value=v;A.years=v;done(q)};
+ m.onclick=()=>set(+i.value-1);p.onclick=()=>set(+i.value+1);i.onchange=()=>set(i.value);
+ s.append(m,i,p,el('span',null,'سال'));q.appendChild(s);
+ const b=el('button','btn','ادامه ←');b.type='button';b.onclick=()=>{set(i.value);next(q)};q.appendChild(b)})();
+
+/* Q9: services */
+const SV=['اشتغال','خرید روزانه مواد غذایی','نانوایی','داروخانه','خدمات آموزشی','خدمات درمانی','بانک/خدمات مالی','خدمات اداری','خرید پوشاک و کالا','ورزش','تفریح و اوقات فراغت','فضای سبز/پارک','فعالیت فرهنگی','فعالیت مذهبی','سایر'];
+const VEH=['پیاده','دوچرخه اشتراکی','دوچرخه شخصی','اتوبوس','مترو','تاکسی','تاکسی اینترنتی','موتورسیکلت','خودروی شخصی','همراه با فرد دیگری','سایر'];
+const R1=['کیفیت','قیمت','تنوع','فاصله','کیفیت محیط','امنیت','راحتی پیاده‌روی','دسترسی به حمل‌ونقل عمومی'];
+const R2=['عادت به استفاده از مکان خاصی در خارج محله','محل کار/تحصیل در محله دیگری است','جذابیت بیشتر مراکز سایر محلات','پارکینگ و دسترسی آسان با خودرو','توصیه دوستان و آشنایان','سایر'];
+const TM=['صبح','ظهر','بعدازظهر','عصر','شب'];
+const DU=['کمتر از ۵ دقیقه','۵ تا ۱۰ دقیقه','۱۱ تا ۱۵ دقیقه','۱۶ تا ۲۰ دقیقه','۲۱ تا ۳۰ دقیقه','بیشتر از ۳۰ دقیقه'];
+const WU=['قطعاً بله','احتمالاً بله','تفاوتی ندارد','احتمالاً خیر','قطعاً خیر'];
+(()=>{N++;const h=el('section','card');const t=el('h2');t.append(el('b',null,FA(N)+'.'),'خدمات و نیازهای روزمره');h.append(t,el('p','hint','برای هر خدمت فقط یک گزینه را لمس کنید؛ اگر از آن استفاده نمی‌کنید، «استفاده نمی‌کنم» را بزنید و به خدمت بعدی بروید.'));app.appendChild(h);
+ A.services={};
+ SV.forEach(name=>{const S=A.services[name]={};const q=el('section','card q');q.appendChild(el('h2',null,name));
+  const seg=el('div','seg');const det=el('div','det');det.hidden=true;
+  const opts=[['no','استفاده نمی‌کنم'],['in','داخل محله'],['out','خارج از محله']];
+  opts.forEach(([k,l])=>{const b=el('button',null,l);b.type='button';b.onclick=()=>{
+   seg.querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+   Object.keys(S).forEach(x=>delete S[x]);S.where=l;det.innerHTML='';
+   if(k==='no'){det.hidden=true;done(q);next(q);return}
+   det.hidden=false;build(k);q.classList.remove('done');prog()};seg.appendChild(b)});
+  function sec(l){det.appendChild(el('h4',null,l))}
+  function finish(){done(q);next(q)}
+  function build(k){
+   sec('این خدمت را کجا دریافت می‌کنید؟ (اختیاری)');placePicker(S,det);
+   sec('با چه وسیله‌ای می‌روید؟ (چندگزینه)');const rt=el('div');rt.hidden=true;
+   det.appendChild(chips(VEH,true,v=>{S.vehicle=v;const bike=v.some(x=>x.includes('دوچرخه'));rt.hidden=!bike;if(!bike)delete S.route}));
+   const rh=el('h4',null,'مسیر دوچرخه‌سواری');rt.append(rh,chips(['مسیر دوچرخه','پیاده‌رو','خیابان'],true,v=>S.route=v));det.appendChild(rt);
+   sec('دلیل استفاده از این خدمت (چندگزینه)');S.reasons={};const rl=el('div');
+   const draw=sel=>{rl.innerHTML='';if(sel.length)rl.appendChild(el('p','hint','اهمیت هر دلیل را مشخص کنید (۱ = کم، ۵ = زیاد)'));
+    sel.forEach(r=>{const row=el('div','rate');row.appendChild(el('span',null,r));const sc=el('div','scale');
+     [1,2,3,4,5].forEach(n=>{const b=el('button',null,FA(n));b.type='button';if(S.reasons[r]===n)b.classList.add('on');
+      b.onclick=()=>{S.reasons[r]=n;sc.querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on')};sc.appendChild(b)});row.appendChild(sc);rl.appendChild(row)})};
+   det.appendChild(chips(k==='out'?R1.concat(R2):R1,true,v=>{Object.keys(S.reasons).forEach(r=>{if(!v.includes(r))delete S.reasons[r]});draw(v)}));det.appendChild(rl);
+   sec('در چه بازه‌ای از روز؟ (چندگزینه)');det.appendChild(chips(TM,true,v=>S.time=v));
+   sec('مدت زمان رفت‌وآمد');
+   det.appendChild(chips(DU,false,v=>{S.duration=v[0];if(k==='in')finish()}));
+   if(k==='out'){sec('اگر این خدمت در ۱۵ دقیقه‌ای محل سکونت شما بود، استفاده می‌کردید؟');det.appendChild(chips(WU,false,v=>{S.wouldUse=v[0];finish()}))}
+   const b=el('button','btn ghost','ادامه ←');b.type='button';b.onclick=finish;det.appendChild(b)}
+  q.append(seg,det);app.appendChild(q)})})();
+
+/* Likert */
+(()=>{N++;const h=el('section','card');const t=el('h2');t.append(el('b',null,FA(N)+'.'),'میزان موافقت شما با گزاره‌های زیر');
+ h.append(t,el('p','hint','۱ = کاملاً مخالف … ۵ = کاملاً موافق'));app.appendChild(h);A.likert={};
+ ['بیشتر نیازهای روزمره من در محله قابل تأمین است.','خدمات موجود در محله کیفیت مناسبی دارند.','برای انجام کارهای روزمره می‌توانم به‌راحتی در محله پیاده‌روی کنم.','دسترسی به خدمات محله برای افراد سالمند و کم‌توان مناسب است.','دسترسی به حمل‌ونقل عمومی از محله مناسب است.','برای بسیاری از نیازهای روزمره مجبور به خروج از محله هستم.','برای تأمین نیازهای روزمره وابستگی زیادی به خودرو دارم.','اگر خدمات باکیفیت‌تری در محله وجود داشته باشد، تمایل دارم بیشتر از خدمات محله استفاده کنم.']
+ .forEach(s=>{const q=el('section','card q row');q.appendChild(el('p',null,s));const sc=el('div','scale');
+  [1,2,3,4,5].forEach(n=>{const b=el('button',null,FA(n));b.type='button';b.onclick=()=>{A.likert[s]=n;sc.querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on');done(q);next(q)};sc.appendChild(b)});
+  const e=el('div','ends');e.append(el('span',null,'کاملاً مخالف'),el('span',null,'کاملاً موافق'));q.append(sc,e);app.appendChild(q)})})();
+
+single('exits','در یک روز معمولی، تقریباً چند بار از منزل خارج می‌شوید؟',['بدون خروج','۱ بار','۲ بار','۳ بار','۴ بار و بیشتر']);
+single('travel','در مجموع، در یک روز معمولی تقریباً چه مقدار زمان صرف رفت‌وآمدهای شما می‌شود؟',['کمتر از ۱۵ دقیقه','۱۶ تا ۳۰ دقیقه','۳۱ تا ۶۰ دقیقه','۶۱ تا ۹۰ دقیقه','بیشتر از ۹۰ دقیقه']);
+single('share','در مجموع، چه میزان از نیازهای روزمره خود را می‌توانید در فاصله ۱۵ دقیقه‌ای محل سکونت تأمین کنید؟',['تقریباً هیچ‌کدام','کمتر از ۲۵٪','۲۵ تا ۵۰٪','۵۱ تا ۷۵٪','بیش از ۷۵٪','تقریباً همه نیازها']);
+[['open1','اگر قرار باشد فقط یک ویژگی یا امکان در محله تغییر کند تا انجام فعالیت‌های روزمره در داخل محله برای شما مطلوب‌تر شود، چه چیزی را تغییر می‌دهید؟'],
+ ['open2','به نظر شما مهم‌ترین تفاوت محله شما با محله‌ای که از نظر انجام فعالیت‌های روزمره برای شما مطلوب است چیست؟'],
+ ['open3','آیا نکته یا پیشنهادی درباره خدمات، فعالیت‌ها، محیط یا امکانات محله دارید که در این پرسشنامه مطرح نشده باشد؟']]
+.forEach(([k,t])=>{const q=Q(t,'اختیاری','opt');const a=el('textarea');a.oninput=()=>A[k]=a.value;q.appendChild(a)});
+
+const sub=el('div','card');sub.id='sub';sub.style.textAlign='center';
+const sb=el('button','btn','ثبت پاسخ‌ها');sb.type='button';sb.style.marginTop='0';
+sb.onclick=()=>{sub.className='card ok';sub.innerHTML='';sub.append(el('h2',null,'🙏 از وقتی که گذاشتید سپاسگزاریم'),el('p','hint','پاسخ‌های شما ثبت شد.'));
+ const c=el('button','btn ghost','کپی پاسخ‌ها');c.type='button';c.onclick=()=>{try{navigator.clipboard.writeText(JSON.stringify(A,null,2));c.textContent='کپی شد ✓'}catch(e){c.textContent='کپی ممکن نشد'}};sub.appendChild(c);sub.scrollIntoView({behavior:'smooth',block:'center'})};
+sub.appendChild(sb);app.appendChild(sub);prog();
+</script>
+</body>
+</html>
